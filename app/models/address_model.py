@@ -1,11 +1,12 @@
-from app.configs.database import db
-from sqlalchemy import Column, ForeignKey, Integer, String
 from dataclasses import dataclass
+
+from sqlalchemy import Column, ForeignKey, Integer, String
+
+from app.configs.database import db
 
 
 @dataclass
 class AddressModel(db.Model):
-    id: int
     cep: str
 
     __tablename__ = "addresses"

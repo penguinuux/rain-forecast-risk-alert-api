@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 
-from app.configs.database import db
 from sqlalchemy import Column, ForeignKey, Integer, String
+
+from app.configs.database import db
 
 
 @dataclass
 class CityModel(db.Model):
-    id: int
     name: str
     state_id: int
 
