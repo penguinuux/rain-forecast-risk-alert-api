@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
-from app.configs.database import db
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
+from app.configs.database import db
 
 from .user_message_model import users_messages
 from .user_risk_model import user_risk
@@ -10,7 +11,6 @@ from .user_risk_model import user_risk
 
 @dataclass
 class UserModel(db.Model):
-    id: int
     name: str
     phone: str
     email: str

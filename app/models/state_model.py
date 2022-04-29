@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
-from app.configs.database import db
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
+
+from app.configs.database import db
 
 
 @dataclass
