@@ -75,14 +75,14 @@ def request_validator(data: list):
     check_for_request_inner_types(data, EXPECTED_KEYS_AND_TYPES)
 
 
-def check_for_request_type(data: list, type):
+def check_for_request_type(data: list, type_expected):
     """
-    This function checks for the main type of the ``data`` request, and compares it to the expected
-    ``type``, and if the typing is different, it raises an error specifying the expected and received
-    types
+    This function checks for the main type of the ``data`` request, and compares it to the
+    ``type_expected``, and if the typing is different, it raises an error specifying the expected
+    and received types
     """
 
-    if type(data) is not type:
+    if type(data) is not type_expected:
         expected_type = type.__name__
         received_type = type(data).__name__
         raise InvalidTypeError(expected_type, received_type)
