@@ -4,9 +4,11 @@
 BaseURL: https://rain-forecast-risk-alert.herokuapp.com/
 ```
 
+---
+
 ## Users
 
-### **POST** /api/users/signup
+### <span style="color: green">**POST**</span> /api/users/signup
 
 Register a new user.
 
@@ -49,13 +51,29 @@ Success-Response:
 }
 ```
 
-Error 4xx
+### Errors
+
+<details>
+<summary>Signup with invalid city</summary>
+Error <span style="color: yellow">4xx</span>
 
 | Nome       | Descrição                                         |
 | ---------- | ------------------------------------------------- |
 | BadRequest | Error Return When Invalid City Parameter Is Sent. |
 
-### **GET** /users
+```json
+{
+  "error": "city out of range",
+  "expected": ["Rio de Janeiro", "São Paulo", "Petrópolis"],
+  "received": "Schroeder"
+}
+```
+
+</details>
+
+---
+
+### <span style="color: purple">**GET**</span> /users
 
 Return all registered users.
 

@@ -1,12 +1,13 @@
 from http import HTTPStatus
 
+from flask import jsonify, request
+from sqlalchemy.orm import Session
+
 from app.configs.database import db
+from app.exceptions.city_exc import CityNotFoundError
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.user_model import UserModel
-from flask import jsonify, request
-from sqlalchemy.orm import Session
-from werkzeug.exceptions import NotFound
 
 
 def signup():
@@ -18,8 +19,11 @@ def signup():
 
     try:
 
-        city_query = session.query(CityModel).filter_by(name=city).first_or_404()
+        city_query = session.query(CityModel).filter_by(name=city).first()
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
+
+        if not city_query:
+            raise CityNotFoundError
 
         new_user = UserModel(**data)
 
@@ -31,7 +35,7 @@ def signup():
             new_user.address = new_cep
 
         session.commit()
-    except NotFound:
+    except CityNotFoundError:
         cities = session.query(CityModel).all()
 
         return {
