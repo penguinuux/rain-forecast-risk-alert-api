@@ -8,7 +8,6 @@ from app.configs.database import db
 
 @dataclass
 class StateModel(db.Model):
-
     name: str
 
     __tablename__ = "states"
