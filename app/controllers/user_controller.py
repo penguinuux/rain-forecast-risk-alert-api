@@ -6,6 +6,7 @@ from app.models.city_model import CityModel
 from app.models.user_model import UserModel
 from flask import jsonify, request
 from sqlalchemy.orm import Session
+from werkzeug.exceptions import NotFound
 
 
 def signup():
@@ -15,20 +16,29 @@ def signup():
     city = data.pop("city")
     cep = data.pop("cep")
 
-    city_query = session.query(CityModel).filter_by(name=city).first_or_404()
-    cep_query = session.query(AddressModel).filter_by(cep=cep).first()
+    try:
 
-    new_user = UserModel(**data)
+        city_query = session.query(CityModel).filter_by(name=city).first_or_404()
+        cep_query = session.query(AddressModel).filter_by(cep=cep).first()
 
-    if cep_query:
-        new_user.address = cep_query
-    else:
-        new_cep = AddressModel(cep=cep)
-        new_cep.city = city_query
+        new_user = UserModel(**data)
+
+        if cep_query:
+            new_user.address = cep_query
+        else:
+            new_cep = AddressModel(cep=cep)
+            new_cep.city = city_query
+            new_user.address = new_cep
+
         session.commit()
-        new_user.address = new_cep
+    except NotFound:
+        cities = session.query(CityModel).all()
 
-    session.commit()
+        return {
+            "error": "city out of range",
+            "expected": [city.name for city in cities],
+            "received": city,
+        }, HTTPStatus.BAD_REQUEST
 
     return (
         jsonify(
