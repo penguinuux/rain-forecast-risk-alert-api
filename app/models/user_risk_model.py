@@ -1,6 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer
-
 from app.configs.database import db
+from sqlalchemy import Column, ForeignKey, Integer
 
 user_risk = db.Table(
     "user_risk",

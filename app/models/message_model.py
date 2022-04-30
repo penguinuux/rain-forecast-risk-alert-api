@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, DateTime, Integer, String
-
 from app.configs.database import db
 from app.models.user_message_model import users_messages
+from sqlalchemy import Column, DateTime, Integer, String
 
 
 @dataclass
@@ -19,4 +18,4 @@ class MessageModel(db.Model):
     text = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
 
-    users = db.relationship("UserModel", secondary=users_messages, backref="messages")
+    # users = db.relationship("UserModel", secondary=users_messages, backref="messages")
