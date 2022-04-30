@@ -83,7 +83,7 @@ def check_for_request_type(data: list, type_expected):
     """
 
     if type(data) is not type_expected:
-        expected_type = type.__name__
+        expected_type = type_expected.__name__
         received_type = type(data).__name__
         raise InvalidTypeError(expected_type, received_type)
 
