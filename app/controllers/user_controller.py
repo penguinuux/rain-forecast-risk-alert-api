@@ -5,14 +5,15 @@ def signup():
 def signin():
     ...
 
-#daqui pra baixo tem q ser autenticado
-def get_user():
+
+# daqui pra baixo tem q ser autenticado
+def retrieve():
     ...
 
 
-def delete_user():
+def delete():
     ...
 
 
-def patch_user():
+def patch():
     ...
