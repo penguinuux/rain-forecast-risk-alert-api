@@ -1,5 +1,6 @@
-from app.configs.database import db
 from sqlalchemy import Column
+
+from app.configs.database import db
 
 users_messages = db.Table(
     "users_messages",
