@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from flask import jsonify, request
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import CityNotFoundError
@@ -63,9 +63,31 @@ def signin():
     ...
 
 
-# authenticated
+# daqui pra baixo tem q ser autenticado
 def retrieve():
-    ...
+
+    session: Session = db.session
+
+    base_query: Query = session.query(UserModel)
+
+    users = base_query.all()
+
+    return (
+        jsonify(
+            [
+                {
+                    "name": user.name,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "address": user.address.cep,
+                    "city": user.address.cities.name,
+                    "state": user.address.cities.state.name,
+                }
+                for user in users
+            ]
+        ),
+        HTTPStatus.OK,
+    )
 
 
 def delete():
