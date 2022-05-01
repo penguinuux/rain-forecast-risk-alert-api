@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import jsonify, request
+from flask_jwt_extended import create_access_token, jwt_required
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
@@ -60,10 +61,22 @@ def signup():
 
 
 def signin():
-    ...
+    data = request.get_json()
+
+    user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
+
+    if not user:
+        return {"message": "User not found"}, HTTPStatus.NOT_FOUND
+
+    if user.verify_password(data["password"]):
+        token = create_access_token(user)
+        return {"token": token}, HTTPStatus.OK
+
+    else:
+        return {"message": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
 
 
-# daqui pra baixo tem q ser autenticado
+@jwt_required()
 def retrieve():
 
     session: Session = db.session
@@ -90,9 +103,11 @@ def retrieve():
     )
 
 
+@jwt_required()
 def delete():
     ...
 
 
+@jwt_required()
 def patch():
     ...
