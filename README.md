@@ -69,7 +69,7 @@ Success-Response:
 <summary>Signup with an invalid city</summary> <a name="users-signup-invalid-city"></a>
 Error <span style="color: yellow">4xx</span>
 
-| Nome       | Descrição                                         |
+| Name       | Description                                       |
 | ---------- | ------------------------------------------------- |
 | BadRequest | Error Return When Invalid City Parameter Is Sent. |
 
