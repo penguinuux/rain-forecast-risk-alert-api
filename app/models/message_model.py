@@ -18,5 +18,3 @@ class MessageModel(db.Model):
     title = Column(String, nullable=False)
     text = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
-
-    users = db.relationship("UserModel", secondary=users_messages, backref="messages")

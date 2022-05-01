@@ -1,17 +1,11 @@
 from flask import Blueprint
 
-from app.controllers.user_controller import (
-    delete_user,
-    get_user,
-    patch_user,
-    signin,
-    signup,
-)
+from app.controllers import user_controller
 
 bp_users = Blueprint("bp_users", __name__, url_prefix="/user")
 
-bp_users.post("/signup")(signup)
-bp_users.post("/signin")(signin)
-bp_users.get("/")(get_user)
-bp_users.patch("/")(patch_user)
-bp_users.delete("/")(delete_user)
+bp_users.post("/signup")(user_controller.signup)
+bp_users.post("/signin")(user_controller.signin)
+bp_users.get("")(user_controller.retrieve)
+bp_users.patch("")(user_controller.patch)
+bp_users.delete("")(user_controller.delete)
