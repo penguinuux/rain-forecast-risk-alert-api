@@ -7,10 +7,12 @@ from app.configs.database import db
 
 @dataclass
 class RiskModel(db.Model):
-
     title: str
     description: str
     text: str
+
+    # Rain precipitation limit in mm
+    PRECIPITATION_LIMIT = 50
 
     __tablename__ = "risks"
 
