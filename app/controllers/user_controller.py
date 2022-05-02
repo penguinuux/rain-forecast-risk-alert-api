@@ -1,11 +1,12 @@
 from http import HTTPStatus
 
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token, decode_token, jwt_required
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import CityNotFoundError
+from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.user_model import UserModel
@@ -69,7 +70,7 @@ def signin():
         return {"message": "User not found"}, HTTPStatus.NOT_FOUND
 
     if user.verify_password(data["password"]):
-        token = create_access_token(user)
+        token = create_access_token(user.id)
         return {"token": token}, HTTPStatus.OK
 
     else:
@@ -105,7 +106,22 @@ def retrieve():
 
 @jwt_required()
 def delete():
-    ...
+    session: Session = db.session
+
+    try:
+        token = request.headers.get("Authorization").split()[-1]
+        decoded_jwt = decode_token(token)
+        user_id = decoded_jwt.get("sub")
+        user: UserModel = UserModel.query.get(user_id)
+        if not user:
+            raise UserNotFound
+    except UserNotFound as e:
+        return e.message, e.status_code
+
+    session.delete(user)
+    session.commit()
+
+    return "", HTTPStatus.NO_CONTENT
 
 
 @jwt_required()
