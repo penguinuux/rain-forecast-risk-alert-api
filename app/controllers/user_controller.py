@@ -95,8 +95,8 @@ def retrieve():
                     "email": user.email,
                     "phone": user.phone,
                     "address": user.address.cep,
-                    "city": user.address.cities.name,
-                    "state": user.address.cities.state.name,
+                    "city": user.address.city.name,
+                    "state": user.address.city.state.name,
                 }
                 for user in users
             ]
