@@ -32,14 +32,14 @@ Register a new user.
 
 ## Parameter
 
-| **Field**     | **Type** | **Description**          |
-| ------------- | -------- | ------------------------ |
-| name          | string   | User Name                |
-| email         | string   | User email               |
-| phone         | string   | User phone number        |
-| cep           | string   | User location cep number |
-| city          | string   | User city location       |
-| password_hash | string   | User password            |
+| **Field** | **Type** | **Description**          |
+| --------- | -------- | ------------------------ |
+| name      | string   | User Name                |
+| email     | string   | User email               |
+| phone     | string   | User phone number        |
+| cep       | string   | User location cep number |
+| city      | string   | User city location       |
+| password  | string   | User password            |
 
 **Body:**
 
@@ -50,7 +50,7 @@ Register a new user.
   "phone": "24976520981",
   "cep": "25651-079",
   "city": "Petrópolis",
-  "password_hash": "uhtw86#b"
+  "password": "uhtw86#b"
 }
 ```
 
