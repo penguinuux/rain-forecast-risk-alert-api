@@ -10,6 +10,7 @@ from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.user_model import UserModel
+from app.exceptions.generic_exc import InvalidKeysError
 
 
 def signup():
@@ -126,4 +127,35 @@ def delete():
 
 @jwt_required()
 def patch():
-    ...
+    authorized_keys = ["email", "phone", "name", "password"]
+
+    try:
+        data = request.get_json()
+        session: Session = db.session
+        token = request.headers.get("Authorization").split()[-1]
+        decoded_jwt = decode_token(token)
+        user_id = decoded_jwt.get("sub")
+        user: UserModel = UserModel.query.get(user_id)
+        
+        if not user:
+            raise UserNotFound
+
+        invalid_keys = []
+        
+        for key, value in data.items():
+            if key in authorized_keys:
+                setattr(user, key, value)
+            else:
+                invalid_keys.append(key)
+
+        if invalid_keys:
+            raise InvalidKeysError(authorized_keys, invalid_keys)
+
+    except InvalidKeysError as e:
+        return e.message, e.status_code
+    except UserNotFound as e:
+        return e.message, e.status_code
+
+    session.commit()
+    
+    return "", HTTPStatus.NO_CONTENT
