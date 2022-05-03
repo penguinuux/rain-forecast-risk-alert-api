@@ -28,21 +28,21 @@ class RiskModel(db.Model):
 
     # TODO: find a better way to display the texts
     VALUES = {
-        "NOT_SPECIFIED": """Atenção! A sua região apresenta previsão para chuvas fortes (ou violentas <depende da milimetragem>). 
+        "NOT_SPECIFIED": """Atenção! A sua região apresenta previsão para chuvas fortes. 
                    
                    Se você mora em região de encostas ou próximo a um rio ou córrego, reúna seus pertences mais importantes 
                    (documentos, dinheiro ou cartões) e se encaminhe para o ponto de apoio da Defesa Civil mais próximo.""",
-        "EARTH_SLIDING": """Atenção! A sua região apresenta previsão para chuvas fortes (ou violentas <depende da milimetragem>). 
+        "EARTH_SLIDING": """Atenção! A sua região apresenta previsão para chuvas fortes. 
                    Você corre risco iminente de deslizamento de terra e possível desabamento. 
 
                    Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e 
                    se encaminhe para o ponto de apoio da Defesa Civil mais próximo.""",
-        "FLOOD": """Atenção! A sua região apresenta previsão para chuvas fortes (ou violentas <depende da milimetragem>). 
+        "FLOOD": """Atenção! A sua região apresenta previsão para chuvas forte. 
                    Você corre risco iminente de deslizamento de terra e possível desabamento. 
 
                    Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e 
                    se encaminhe para o ponto de apoio da Defesa Civil mais próximo.""",
-        "FLOOD_AND_SLIDING": """Atenção! A sua região apresenta previsão para chuvas fortes (ou violentas <depende da milimetragem>). 
+        "FLOOD_AND_SLIDING": """Atenção! A sua região apresenta previsão para chuvas fortes. 
                    Você corre risco iminente de deslizamento de terra, desabamento e alagamento. 
 
                    Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e 
