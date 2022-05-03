@@ -1,7 +1,7 @@
 from flask import Flask
 
-from .city_and_state_commands import state_and_city_cli
+from .populate_db_commands import populate_db_cli
 
 
 def init_app(app: Flask):
-    app.cli.add_command(state_and_city_cli())
+    app.cli.add_command(populate_db_cli())
