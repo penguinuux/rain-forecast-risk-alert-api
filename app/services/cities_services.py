@@ -1,6 +1,3 @@
-from http import HTTPStatus
-
-from flask import jsonify
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
@@ -8,7 +5,7 @@ from app.exceptions.state_exc import StateNotFoundError
 from app.models.state_model import StateModel
 
 
-def get_cities():
+def get_states_and_cities():
     session: Session = db.session
 
     base_query: Query = session.query(StateModel)
@@ -17,10 +14,10 @@ def get_cities():
 
     serializer = [{"state": state.name, "cities": state.cities} for state in states]
 
-    return jsonify(serializer), HTTPStatus.OK
+    return serializer
 
 
-def get_city(state):
+def get_cities_from_state(state):
 
     session: Session = db.session
 
@@ -31,6 +28,6 @@ def get_city(state):
     if not state:
         raise StateNotFoundError
 
-    city = {"state": state.name, "cities": state.cities}
+    cities_from_state = {"state": state.name, "cities": state.cities}
 
-    return jsonify(city), HTTPStatus.OK
+    return cities_from_state
