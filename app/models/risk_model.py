@@ -17,6 +17,6 @@ class RiskModel(db.Model):
     __tablename__ = "risks"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     text = Column(String, nullable=False)
