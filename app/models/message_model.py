@@ -1,19 +1,14 @@
 from dataclasses import dataclass
+from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer
 
 from app.configs.database import db
 
 
 @dataclass
 class MessageModel(db.Model):
-    title: str
-    text: str
-    date: str
-
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
-    text = Column(String, nullable=False)
-    date = Column(DateTime, nullable=False)
+    date = Column(DateTime, nullable=False, default=datetime.now())
