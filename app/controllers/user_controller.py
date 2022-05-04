@@ -16,7 +16,7 @@ from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.generic_services import get_user_from_token
-from app.services.user_services import validate_and_setattr, validate_type
+from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
 
 
@@ -126,12 +126,11 @@ def delete():
 @jwt_required()
 def patch():
     session: Session = db.session
-
+    allowed_keys = ["email", "phone", "name", "password"]
     try:
         data = request.get_json()
         user = get_user_from_token()
-        validate_type(data)
-        validate_and_setattr(data, user)
+        validate_keys_and_values(data, user, allowed_keys)
 
     except InvalidKeysError as e:
         return e.message, e.status_code
