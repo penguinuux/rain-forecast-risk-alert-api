@@ -48,11 +48,11 @@ async def validate_zip_code(zip_code: str):
 
     if not city_query:
         cities = session.query(CityModel).all()
-        cities_formated = [{"city": city.name, "uf": city.state.uf} for city in cities]
+        cities_formatted = [{"city": city.name, "uf": city.state.uf} for city in cities]
 
-        raise CityNotFoundError(expected_type=cities_formated, received_type=city)
+        raise CityNotFoundError(expected_type=cities_formatted, received_type=city)
 
     if city_query.state.uf != uf:
-        raise CityOutOfRangeError(expected_type=cities_formated, received_type=city)
+        raise CityOutOfRangeError(expected_type=cities_formatted, received_type=city)
 
     return city_query
