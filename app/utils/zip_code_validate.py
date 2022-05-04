@@ -2,12 +2,11 @@ import json
 
 from aiohttp import ClientSession
 from sqlalchemy.orm import Session
-from werkzeug import Client
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
-    CityNotFoundError,
     CityOutOfRangeError,
+    InvalidZipCodeError,
     ZipCodeNotFoundError,
 )
 from app.models.city_model import CityModel
@@ -35,7 +34,10 @@ async def validate_zip_code(zip_code: str):
         ) as response:
             response = await response.read()
 
-    zip_dict = json.loads(response.decode("utf-8"))
+    try:
+        zip_dict = json.loads(response.decode("utf-8"))
+    except json.JSONDecodeError:
+        raise InvalidZipCodeError(zip_code)
 
     error = zip_dict.get("erro")
     city = zip_dict.get("localidade")
@@ -50,7 +52,7 @@ async def validate_zip_code(zip_code: str):
         cities = session.query(CityModel).all()
         cities_formatted = [{"city": city.name, "uf": city.state.uf} for city in cities]
 
-        raise CityNotFoundError(expected_type=cities_formatted, received_type=city)
+        raise CityOutOfRangeError(expected_type=cities_formatted, received_type=city)
 
     if city_query.state.uf != uf:
         raise CityOutOfRangeError(expected_type=cities_formatted, received_type=city)
