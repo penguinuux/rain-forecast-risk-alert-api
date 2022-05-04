@@ -11,11 +11,14 @@ from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.user_model import UserModel
+from app.services.user_data_formater_services import data_formater
 
 
 def signup():
     session: Session = db.session
     data = request.get_json()
+
+    data_formater(data)
 
     city = data.pop("city")
     cep = data.pop("cep")

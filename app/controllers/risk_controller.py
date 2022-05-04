@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 from flask_jwt_extended import jwt_required
 from sqlalchemy.orm import Session
 
