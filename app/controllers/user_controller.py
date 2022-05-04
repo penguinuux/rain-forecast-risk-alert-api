@@ -6,24 +6,25 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import CityNotFoundError
+from app.exceptions.data_validation_exc import InvalidFormat
 from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.user_model import UserModel
-from app.services.user_data_formater_services import data_formater
+from app.services.user_data_formater_services import validate_data
 
 
 def signup():
     session: Session = db.session
     data = request.get_json()
-
-    data_formater(data)
-
-    city = data.pop("city")
-    cep = data.pop("cep")
-
+ 
     try:
+
+        validate_data(data)
+
+        city = data.pop("city")
+        cep = data.pop("cep")
 
         city_query = session.query(CityModel).filter_by(name=city).first()
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
@@ -49,6 +50,9 @@ def signup():
             "expected": [city.name for city in cities],
             "received": city,
         }, HTTPStatus.BAD_REQUEST
+
+    except InvalidFormat as error:
+        return error.message,error.status_code
 
     return (
         jsonify(
