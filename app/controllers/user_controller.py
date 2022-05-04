@@ -11,6 +11,7 @@ from app.exceptions.city_exc import (
     CityOutOfRangeError,
     ZipCodeNotFoundError,
 )
+from app.exceptions.generic_exc import ObjNotFoundError
 from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
@@ -39,7 +40,7 @@ def signup():
             new_user.address = new_cep
 
         session.commit()
-    except ZipCodeNotFoundError as e:
+    except ObjNotFoundError as e:
         return e.message, e.status_code
     except CityNotFoundError as e:
         return e.message, e.status_code

@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from flask import jsonify
 
-from app.exceptions.state_exc import StateNotFoundError
+from app.exceptions.generic_exc import ObjNotFoundError
 from app.services.cities_services import get_cities_from_state, get_states_and_cities
 
 
@@ -17,9 +17,9 @@ def all_cities_from_state(state):
 
     try:
 
-        cities_from_state = get_cities_from_state(state)
+        cities_from_state = get_cities_from_state(state) 
 
-    except StateNotFoundError as err:
-        return err.message, HTTPStatus.NOT_FOUND
+    except ObjNotFoundError as err:
+        return err.message, err.status_code
 
     return jsonify(cities_from_state), HTTPStatus.OK

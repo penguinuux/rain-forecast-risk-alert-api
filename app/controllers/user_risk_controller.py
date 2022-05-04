@@ -6,6 +6,7 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.user_exc import UserNotFound
+from app.exceptions.generic_exc import ObjNotFoundError
 from app.models.risk_model import RiskModel
 from app.models.user_model import UserModel
 
@@ -20,7 +21,7 @@ def create_user_risk_profile():
     user: UserModel = UserModel.query.get(user_id)
 
     if not user:
-        raise UserNotFound
+        raise ObjNotFoundError("user")
 
     selected_case = ""
 

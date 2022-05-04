@@ -10,6 +10,8 @@ from app.exceptions.city_exc import (
     CityOutOfRangeError,
     ZipCodeNotFoundError,
 )
+
+from app.exceptions.generic_exc import ObjNotFoundError
 from app.models.city_model import CityModel
 
 
@@ -42,15 +44,15 @@ async def validate_zip_code(zip_code: str):
     uf = zip_dict.get("uf")
 
     if error:
-        raise ZipCodeNotFoundError
+        raise ObjNotFoundError("zip-code")
 
     city_query = session.query(CityModel).filter_by(name=city).first()
 
     if not city_query:
         cities = session.query(CityModel).all()
         cities_formatted = [{"city": city.name, "uf": city.state.uf} for city in cities]
-
-        raise CityNotFoundError(expected_type=cities_formatted, received_type=city)
+        message = {"error": "city not found!", "cities_expected": cities_formatted, "received_city": city}
+        raise ObjNotFoundError(message = message)
 
     if city_query.state.uf != uf:
         raise CityOutOfRangeError(expected_type=cities_formatted, received_type=city)

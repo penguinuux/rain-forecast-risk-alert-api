@@ -68,3 +68,24 @@ class InvalidKeysError(Exception):
             }
 
         self.status_code = status_code
+
+class ObjNotFoundError(Exception):
+    def __init__(
+        self,
+        request: str = "request",
+        message: str = "",
+        status_code: int = HTTPStatus.NOT_FOUND,
+        *args,
+        **kwargs
+    ):
+        super().__init__(args,kwargs)
+        if message:
+            self.message = message
+        else:
+            self.message = {
+                "error": f"{request} not found!",
+            }
+
+        self.status_code = status_code
+
+        
