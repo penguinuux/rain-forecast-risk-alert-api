@@ -8,7 +8,7 @@ from sqlalchemy.orm import Query, Session
 from app.configs.database import db
 from app.exceptions.city_exc import (
     CityOutOfRangeError,
-    InvalidZipCodeError,
+    InvalidZipCodeFormatError,
     ZipCodeNotFoundError,
 )
 from app.exceptions.generic_exc import InvalidKeysError
@@ -39,7 +39,7 @@ def signup():
             new_user.address = new_cep
 
         session.commit()
-    except InvalidZipCodeError as e:
+    except InvalidZipCodeFormatError as e:
         return e.message, e.status_code
     except ZipCodeNotFoundError as e:
         return e.message, e.status_code

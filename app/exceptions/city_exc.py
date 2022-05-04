@@ -27,8 +27,8 @@ class CityNotFoundError(Exception):
 class CityOutOfRangeError(Exception):
     def __init__(
         self,
-        expected_type: dict = {},
-        received_type: dict = {},
+        cities_coverage: dict = {},
+        received_city: dict = {},
         message: str = "",
         status_code: int = HTTPStatus.BAD_REQUEST,
         *args,
@@ -39,9 +39,9 @@ class CityOutOfRangeError(Exception):
             self.message = message
         else:
             self.message = {
-                "error": "city out of range",
-                "received_type": received_type,
-                "expected_type": expected_type,
+                "error": "city out of coverage",
+                "received_city": received_city,
+                "cities_coverage": cities_coverage,
             }
 
         self.status_code = status_code
@@ -66,7 +66,7 @@ class ZipCodeNotFoundError(Exception):
         self.status_code = status_code
 
 
-class InvalidZipCodeError(Exception):
+class InvalidZipCodeFormatError(Exception):
     def __init__(
         self,
         zip_code: str,
@@ -80,7 +80,7 @@ class InvalidZipCodeError(Exception):
             self.message = message
         else:
             self.message = {
-                "error": "invalid zip code",
+                "error": "invalid zip code format",
                 "expected_type": "99999-999",
                 "received_type": zip_code,
             }
