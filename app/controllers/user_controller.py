@@ -15,6 +15,8 @@ from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
+from app.services.generic_services import get_user_from_token
+from app.services.user_services import validate_and_setattr, validate_type
 from app.utils.zip_code_validate import validate_zip_code
 
 
@@ -109,10 +111,7 @@ def delete():
     session: Session = db.session
 
     try:
-        token = request.headers.get("Authorization").split()[-1]
-        decoded_jwt = decode_token(token)
-        user_id = decoded_jwt.get("sub")
-        user: UserModel = UserModel.query.get(user_id)
+        user = get_user_from_token()
         if not user:
             raise UserNotFound
     except UserNotFound as e:
@@ -126,29 +125,13 @@ def delete():
 
 @jwt_required()
 def patch():
-    authorized_keys = ["email", "phone", "name", "password"]
+    session: Session = db.session
 
     try:
         data = request.get_json()
-        session: Session = db.session
-        token = request.headers.get("Authorization").split()[-1]
-        decoded_jwt = decode_token(token)
-        user_id = decoded_jwt.get("sub")
-        user: UserModel = UserModel.query.get(user_id)
-
-        if not user:
-            raise UserNotFound
-
-        invalid_keys = []
-
-        for key, value in data.items():
-            if key in authorized_keys:
-                setattr(user, key, value)
-            else:
-                invalid_keys.append(key)
-
-        if invalid_keys:
-            raise InvalidKeysError(authorized_keys, invalid_keys)
+        user = get_user_from_token()
+        validate_type(data)
+        validate_and_setattr(data, user)
 
     except InvalidKeysError as e:
         return e.message, e.status_code
