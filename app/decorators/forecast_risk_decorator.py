@@ -1,10 +1,7 @@
 from flask import request
 
-from app.exceptions.generic_exc import (
-    InvalidKeysError,
-    InvalidTypeError,
-    MissingKeysError,
-)
+from app.exceptions.generic_exc import (InvalidKeysError, InvalidTypeError,
+                                        MissingKeysError)
 from app.services import forecast_risk_services
 
 

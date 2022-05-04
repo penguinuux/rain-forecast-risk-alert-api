@@ -1,11 +1,8 @@
 from sqlalchemy.orm.session import Session
 
 from app.configs.database import db
-from app.exceptions.generic_exc import (
-    InvalidKeysError,
-    InvalidTypeError,
-    MissingKeysError,
-)
+from app.exceptions.generic_exc import (InvalidKeysError, InvalidTypeError,
+                                        MissingKeysError)
 from app.models.address_model import AddressModel
 from app.models.city_model import CityModel
 from app.models.state_model import StateModel
