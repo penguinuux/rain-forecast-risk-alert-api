@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 
 from flask import jsonify, request
@@ -21,7 +22,7 @@ def signup():
 
     try:
 
-        city_query = validate_zip_code(cep)
+        city_query = asyncio.run(validate_zip_code(cep))
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
 
         new_user = UserModel(**data)

@@ -1,13 +1,16 @@
-import requests
-from app.models.city_model import CityModel
+import json
+
+from aiohttp import ClientSession
+from sqlalchemy.orm import Session
+from werkzeug import Client
+
+from app.configs.database import db
 from app.exceptions.city_exc import (
     CityNotFoundError,
-    ZipCodeNotFoundError,
     CityOutOfRangeError,
+    ZipCodeNotFoundError,
 )
-from sqlalchemy.orm import Session
-from app.configs.database import db
-import json
+from app.models.city_model import CityModel
 
 
 async def validate_zip_code(zip_code: str):
@@ -26,8 +29,13 @@ async def validate_zip_code(zip_code: str):
 
     session: Session = db.session
 
-    response = requests.get("https://viacep.com.br/ws/{s}/json/".format(zip_code))
-    zip_dict = json.load(response)
+    async with ClientSession() as client_session:
+        async with client_session.get(
+            f"https://viacep.com.br/ws/{zip_code}/json/"
+        ) as response:
+            response = await response.read()
+
+    zip_dict = json.loads(response.decode("utf-8"))
 
     error = zip_dict.get("erro")
     city = zip_dict.get("localidade")
