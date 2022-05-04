@@ -1,55 +1,38 @@
 from http import HTTPStatus
 
 from flask import request
-from flask_jwt_extended import decode_token, jwt_required
-from sqlalchemy.orm import Query, Session
+from flask_jwt_extended import jwt_required
 
 from app.configs.database import db
+from app.exceptions.generic_exc import (
+    InvalidKeysError,
+    InvalidTypeError,
+    MissingKeysError,
+)
 from app.exceptions.user_exc import UserNotFound
-from app.models.risk_model import RiskModel
-from app.models.user_model import UserModel
+from app.services.generic_services import get_user_from_token
+from app.services.user_risk_profile_services import (
+    select_risk_case,
+    validate_keys_and_values,
+)
 
 
 @jwt_required()
 def create_user_risk_profile():
-    data = request.get_json()
-    session: Session = db.session
-    token = request.headers.get("Authorization").split()[-1]
-    decoded_jwt = decode_token(token)
-    user_id = decoded_jwt.get("sub")
-    user: UserModel = UserModel.query.get(user_id)
-
-    if not user:
-        raise UserNotFound
-
-    selected_case = ""
-
-    for case_key, case_value in RiskModel.CASES.items():
-        # TODO: find a better name to count variable
-        count = 0
-        for key, value in data.items():
-            if value == case_value[key]:
-                count += 1
-            if count == 2:
-                selected_case = case_key
-
-    message = RiskModel.VALUES[selected_case]
-    risk_query: Query = session.query(RiskModel)
-
-    risk: RiskModel = risk_query.filter_by(title=selected_case).first()
-
-    if not risk:
-
-        risk_data = {"title": selected_case, "text": message}
-
-        risk = RiskModel(**risk_data)
-
-    if user.risks:
-        user.risks = []
-
-    risk.users.append(user)
-    session.add(risk)
-    session.commit()
+    try:
+        allowed_keys = ["live_nearby_river", "live_nearby_mountain"]
+        data = request.get_json()
+        validate_keys_and_values(data, allowed_keys)
+        user = get_user_from_token()
+        select_risk_case(data, user)
+    except MissingKeysError as e:
+        return e.message, e.status_code
+    except InvalidKeysError as e:
+        return e.message, e.status_code
+    except InvalidTypeError as e:
+        return e.message, e.status_code
+    except UserNotFound as e:
+        return e.message, e.status_code
 
     serialized_user = {
         "name": user.name,

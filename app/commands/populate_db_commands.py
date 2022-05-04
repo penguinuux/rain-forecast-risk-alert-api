@@ -22,8 +22,8 @@ def populate_db_cli():
     def create_states_and_cities(amount):
 
         create_states_and_insert_into_db()
-        cities = create_cities_and_insert_into_db()
-        create_user_addresses_and_insert_into_db(fake, cities, amount)
+        create_cities_and_insert_into_db()
+        create_user_addresses_and_insert_into_db(fake, amount)
 
     return populate_db
 
@@ -36,12 +36,25 @@ def create_states_and_insert_into_db():
     print("=" * 60, "\n")
     print("Adding states to the database...")
 
-    states = [StateModel(name=state) for state in state_list]
+    session: Session = db.session
+    already_added_states = session.query(StateModel).all()
+
+    states = [
+        StateModel(name=state.get("name"), uf=state.get("UF"))
+        for state in state_list
+        if StateModel(name=state.get("name"), uf=state.get("UF"))
+        not in already_added_states
+    ]
 
     session.add_all(states)
     session.commit()
 
-    print(f"Added {len(state_list)} states to the database successfully.", "\n")
+    if len(states) == 0:
+        print(f"The states are already in your database.", "\n")
+    elif len(states) == 1:
+        print(f"Added {len(states)} state to the database successfully.", "\n")
+    else:
+        print(f"Added {len(states)} states to the database successfully.", "\n")
 
 
 def create_cities_and_insert_into_db():
@@ -54,6 +67,8 @@ def create_cities_and_insert_into_db():
     cities_list = []
 
     session: Session = db.session
+    already_added_cities = session.query(CityModel).all()
+
     for city_dict in names_and_states_cities_list:
         city_name = city_dict.get("name")
         state_name = city_dict.get("state")
@@ -65,19 +80,23 @@ def create_cities_and_insert_into_db():
 
         city = CityModel(**city_info)
 
-        cities_list.append(city)
+        if city not in already_added_cities:
+            cities_list.append(city)
 
     session.add_all(cities_list)
     session.commit()
 
-    print(f"Added {len(cities_list)} cities to the database successfully.", "\n")
+    if len(cities_list) == 0:
+        print(f"The cities are already in your database.", "\n")
+    elif len(cities_list) == 1:
+        print(f"Added {len(cities_list)} city to the database successfully.", "\n")
+    else:
+        print(f"Added {len(cities_list)} cities to the database successfully.", "\n")
 
     return cities_list
 
 
-def create_user_addresses_and_insert_into_db(
-    fake: Faker, cities: list[CityModel], amount: int
-):
+def create_user_addresses_and_insert_into_db(fake: Faker, amount: int):
 
     print("~" * 60, "\n")
     print("Adding users to the database...")
@@ -85,7 +104,7 @@ def create_user_addresses_and_insert_into_db(
     for _ in range(amount):
         session: Session = db.session
 
-        user_data = create_user_data(fake, cities)
+        user_data = create_user_data(fake)
         user: UserModel = UserModel(**user_data)
 
         session.add(user)
@@ -98,14 +117,14 @@ def create_user_addresses_and_insert_into_db(
     print("=" * 60)
 
 
-def create_user_data(fake: Faker, cities: list[CityModel]):
+def create_user_data(fake: Faker):
 
     name = f"{fake.first_name()} {fake.last_name()}"
     email = f"{name}@{fake.free_email_domain()}".lower().replace(" ", ".")
     phone_numer = fake.msisdn()[2:]
     phone = f"({phone_numer[:2]}) {phone_numer[2:7]}-{phone_numer[7:]}"
 
-    address = create_address(fake, cities)
+    address = create_address()
 
     user_data = {
         "name": name,
@@ -118,13 +137,23 @@ def create_user_data(fake: Faker, cities: list[CityModel]):
     return user_data
 
 
-def create_address(fake: Faker, cities: list[CityModel]):
+def create_address():
+
+    session: Session = db.session
+    cities = session.query(CityModel).all()
 
     city = choice(cities)
-    cep_number = fake.postcode()
-    cep = cep_number if "-" in cep_number else f"{cep_number[0:-3]}-{cep_number[-3:]}"
 
-    address_data = {"cep": cep, "city_id": city.id}
+    names_states_cities_zip_code_list = city_state_info.city_list
+    choosen_city_ceps = [
+        choosen_city.get("cep")
+        for choosen_city in names_states_cities_zip_code_list
+        if choosen_city.get("name") == city.name
+    ][0]
+
+    cep_number = choice(choosen_city_ceps)
+
+    address_data = {"cep": cep_number, "city_id": city.id}
 
     session: Session = db.session
 
