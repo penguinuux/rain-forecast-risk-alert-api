@@ -8,7 +8,7 @@ from app.configs.database import db
 
 @dataclass
 class MessageModel(db.Model):
-    __tablename__ = "messages"
+    __tablename__ = "message_logs"
 
     id = Column(Integer, primary_key=True)
     date = Column(DateTime, nullable=False, default=datetime.now())
