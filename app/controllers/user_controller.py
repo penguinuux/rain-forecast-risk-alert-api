@@ -7,8 +7,8 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
-    CityNotFoundError,
     CityOutOfRangeError,
+    InvalidZipCodeError,
     ZipCodeNotFoundError,
 )
 from app.exceptions.generic_exc import (
@@ -51,9 +51,9 @@ def signup():
         insert_default_risk(new_user)
 
         session.commit()
-    except ZipCodeNotFoundError as e:
+    except InvalidZipCodeError as e:
         return e.message, e.status_code
-    except CityNotFoundError as e:
+    except ZipCodeNotFoundError as e:
         return e.message, e.status_code
     except CityOutOfRangeError as e:
         return e.message, e.status_code
