@@ -28,8 +28,8 @@ class RiskModel(db.Model):
 
     # TODO: find a better way to display the texts
     VALUES = {
-        "NOT_SPECIFIED": "Atenção! A sua região apresenta previsão para chuvas fortes. Se você mora em região de encostas ou próximo a um rio ou córrego, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e se encaminhe para o ponto de apoio da Defesa Civil mais próximo.",
-        "EARTH_SLIDING": "Atenção! A sua região apresenta previsão para chuvas fortes. Você corre risco iminente de deslizamento de terra e possível desabamento. Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e se encaminhe para o ponto de apoio da Defesa Civil mais próximo.",
-        "FLOOD": "Atenção! A sua região apresenta previsão para chuvas forte. Você corre risco iminente de deslizamento de terra e possível desabamento. Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e se encaminhe para o ponto de apoio da Defesa Civil mais próximo.",
-        "FLOOD_AND_SLIDING": "Atenção! A sua região apresenta previsão para chuvas fortes. Você corre risco iminente de deslizamento de terra, desabamento e alagamento. Se ainda não começou a chover, reúna seus pertences mais importantes (documentos, dinheiro ou cartões) e se encaminhe para o ponto de apoio da Defesa Civil mais próximo.",
+        "NOT_SPECIFIED": "FORTES CHUVAS: Se mora próximo a encosta ou rio, reúna pertences importantes (documento/dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil mais próximo.",
+        "EARTH_SLIDING": "FORTES CHUVAS: RISCO DE DESLIZAMENTO, reúna pertences importantes (documentos e dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil mais próximo.",
+        "FLOOD": "FORTES CHUVAS: RISCO DE ALAGAMENTO, reúna pertences importantes (documentos e dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil mais próximo.",
+        "FLOOD_AND_SLIDING": "FORTES CHUVAS: RISCO DE DESLIZAMENTO E ALAGAMENTO, reúna pertences importantes (documentos/dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil + próximo.",
     }
