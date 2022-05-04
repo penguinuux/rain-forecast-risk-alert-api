@@ -377,3 +377,88 @@ Error-Response:
 </details>
 
 ---
+
+## <center>**Messages** <a name="users"></a></center>
+
+---
+
+### <span style="color: green">**GET**</span> /api/messages <a name="messages-get"></a>
+
+Get a list of messages log.
+
+- Not authenticated
+
+**Parameter:**
+
+_Doesn't have_
+
+Success-Response:
+
+<details>
+<summary>messages request with invalid request type</summary> <a name="messages-valid-request-type"></a>
+**HTTP/1.1**: 200 **OK**
+
+```json
+[
+  {
+    "message id": 1,
+    "date": "Sat, 30 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      }
+    ]
+  },
+  {
+    "message id": 2,
+    "date": "Fri, 29 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520999",
+        "email": "d.motta@gmail.caom"
+      }
+    ]
+  },
+  {
+    "message id": 3,
+    "date": "Thu, 28 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520999",
+        "email": "d.motta@gmail.caom"
+      }
+    ]
+  }
+]
+```
+
+</details>

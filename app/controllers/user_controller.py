@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 
 from flask import jsonify, request
@@ -5,15 +6,18 @@ from flask_jwt_extended import create_access_token, decode_token, jwt_required
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
-from app.exceptions.city_exc import CityNotFoundError
-from app.exceptions.data_validation_exc import InvalidFormat
+from app.exceptions.city_exc import (
+    CityNotFoundError,
+    CityOutOfRangeError,
+    ZipCodeNotFoundError,
+)
 from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
-from app.models.city_model import CityModel
 from app.models.user_model import UserModel
 from app.services.user_data_formater_services import validate_data
-
+from app.utils.zip_code_validate import validate_zip_code
+from app.exceptions.data_validation_exc import InvalidFormat
 
 def signup():
     session: Session = db.session
@@ -22,15 +26,13 @@ def signup():
     try:
 
         validate_data(data)
+        cep = data.pop("cep")
 
         city = data.pop("city")
         cep = data.pop("cep")
 
-        city_query = session.query(CityModel).filter_by(name=city).first()
+        city_query = asyncio.run(validate_zip_code(cep))
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
-
-        if not city_query:
-            raise CityNotFoundError
 
         new_user = UserModel(**data)
 
@@ -42,14 +44,12 @@ def signup():
             new_user.address = new_cep
 
         session.commit()
-    except CityNotFoundError:
-        cities = session.query(CityModel).all()
-
-        return {
-            "error": "city out of range",
-            "expected": [city.name for city in cities],
-            "received": city,
-        }, HTTPStatus.BAD_REQUEST
+    except ZipCodeNotFoundError as e:
+        return e.message, e.status_code
+    except CityNotFoundError as e:
+        return e.message, e.status_code
+    except CityOutOfRangeError as e:
+        return e.message, e.status_code
 
     except InvalidFormat as error:
         return error.message,error.status_code
