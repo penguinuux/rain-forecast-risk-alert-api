@@ -5,6 +5,9 @@ from app.exceptions.data_validation_exc import InvalidFormat
 
 def validate_data(data):
 
+    data["name"] = data["name"].title()
+    data["email"] = data["email"].lower()
+
     email_pattern = "^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$"
     email_form = re.fullmatch(email_pattern, data["email"].lower())
 
@@ -18,5 +21,7 @@ def validate_data(data):
     if not cep_form:
         raise InvalidFormat("cep", "xxxxx-xxx", data["cep"])
 
-    if not phone_form:
+    if phone_form:
         raise InvalidFormat("phone", "(xx)xxxxx-xxxx", data["phone"])
+
+    return data
