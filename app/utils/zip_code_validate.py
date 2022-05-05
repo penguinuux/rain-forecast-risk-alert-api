@@ -2,7 +2,6 @@ import json
 
 from aiohttp import ClientSession
 from sqlalchemy.orm import Session
-from werkzeug import Client
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
