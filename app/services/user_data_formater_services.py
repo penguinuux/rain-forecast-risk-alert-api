@@ -16,12 +16,11 @@ def validate_data(data):
 
     phone_pattern = "([0-9]{2})[0-9]{5}-[0-9]{4}"
     phone_form = re.fullmatch(phone_pattern, data["phone"])
-    
+
     if not email_form:
         raise InvalidFormat("email", "name@email.com", data["email"])
     if not cep_form:
         raise InvalidFormat("cep", "xxxxx-xxx", data["cep"])
-
     if phone_form:
         raise InvalidFormat("phone", "(xx)xxxxx-xxxx", data["phone"])
 
