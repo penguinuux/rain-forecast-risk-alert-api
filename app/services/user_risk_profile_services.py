@@ -50,7 +50,7 @@ def select_risk_case(data: dict, user: UserModel):
         for key, value in data.items():
             if value == case_value[key]:
                 case_validator += 1
-            if case_validator == 2:
+            if case_validator == len(RiskModel.VALIDATOR):
                 selected_case = case_key
 
     message = RiskModel.VALUES[selected_case]
@@ -69,3 +69,10 @@ def select_risk_case(data: dict, user: UserModel):
     risk.users.append(user)
     session.add(risk)
     session.commit()
+
+
+def insert_default_risk(user: UserModel):
+
+    data = {key: False for key in RiskModel.VALIDATOR.keys()}
+
+    select_risk_case(data, user)

@@ -6,11 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.configs.database import db
 from app.models.message_model import MessageModel
-from app.services.messages_queries_services import (
-    query_by_city,
-    query_by_date,
-    query_by_state,
-)
+from app.services.messages_services import query_by_city, query_by_date, query_by_state
 
 
 def retrieve():

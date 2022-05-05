@@ -9,14 +9,23 @@ from app.configs.database import db
 from app.exceptions.city_exc import (
     CityNotFoundError,
     CityOutOfRangeError,
+    InvalidZipCodeFormatError,
     ZipCodeNotFoundError,
 )
 from app.exceptions.data_validation_exc import InvalidFormat
-from app.exceptions.generic_exc import InvalidKeysError
+from app.exceptions.generic_exc import (
+    InvalidCredentialsError,
+    InvalidKeysError,
+    InvalidTypeError,
+    MissingKeysError,
+    UniqueKeyError,
+)
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
-from app.services.user_data_formater_services import validate_data
+from app.services.generic_services import get_user_from_token
+from app.services.user_risk_profile_services import insert_default_risk
+from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
 
 
@@ -26,12 +35,9 @@ def signup():
 
     try:
 
-        validate_data(data)
-        cep = data.pop("cep")
+        validate_keys_and_values(data, signup=True)
 
-        city = data.pop("city")
         cep = data.pop("cep")
-
         city_query = asyncio.run(validate_zip_code(cep))
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
 
@@ -44,12 +50,22 @@ def signup():
             new_cep.city = city_query
             new_user.address = new_cep
 
+        insert_default_risk(new_user)
+
         session.commit()
+    except InvalidZipCodeFormatError as e:
+        return e.message, e.status_code
     except ZipCodeNotFoundError as e:
         return e.message, e.status_code
-    except CityNotFoundError as e:
-        return e.message, e.status_code
     except CityOutOfRangeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except MissingKeysError as e:
+        return e.message, e.status_code
+    except InvalidKeysError as e:
+        return e.message, e.status_code
+    except InvalidTypeError as e:
         return e.message, e.status_code
 
     except InvalidFormat as error:
@@ -135,34 +151,35 @@ def delete():
 
 @jwt_required()
 def patch():
-    authorized_keys = ["email", "phone", "name", "password"]
-
+    session: Session = db.session
     try:
         data = request.get_json()
-        session: Session = db.session
-        token = request.headers.get("Authorization").split()[-1]
-        decoded_jwt = decode_token(token)
-        user_id = decoded_jwt.get("sub")
-        user: UserModel = UserModel.query.get(user_id)
+        user = get_user_from_token()
 
-        if not user:
-            raise UserNotFound
+        validate_keys_and_values(data, user, update=True)
 
-        invalid_keys = []
+        cep = data.get("cep", None)
+        if cep:
+            asyncio.run(validate_zip_code(cep))
 
-        for key, value in data.items():
-            if key in authorized_keys:
-                setattr(user, key, value)
-            else:
-                invalid_keys.append(key)
-
-        if invalid_keys:
-            raise InvalidKeysError(authorized_keys, invalid_keys)
-
+    except MissingKeysError as e:
+        return e.message, e.status_code
     except InvalidKeysError as e:
         return e.message, e.status_code
     except UserNotFound as e:
         return e.message, e.status_code
+    except InvalidTypeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except InvalidCredentialsError as e:
+        return e.message, e.status_code
+    except CityNotFoundError as e:
+        return e.message, e.status_code
+
+    for key, value in data.items():
+        if key in UserModel.VALIDATOR.keys():
+            setattr(user, key, value)
 
     session.commit()
 
