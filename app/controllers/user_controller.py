@@ -24,6 +24,7 @@ from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.generic_services import get_user_from_token
+from app.services.user_data_formater_services import validate_data
 from app.services.user_risk_profile_services import insert_default_risk
 from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
@@ -36,6 +37,8 @@ def signup():
     try:
 
         validate_keys_and_values(data, signup=True)
+
+        validate_data(data)
 
         cep = data.pop("cep")
         city_query = asyncio.run(validate_zip_code(cep))
