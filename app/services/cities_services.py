@@ -11,9 +11,8 @@ def get_states_and_cities():
     base_query: Query = session.query(StateModel).order_by(StateModel.name)
 
     states = base_query.all()
-
-    serializer = [{"state": state.name, "cities": [city.name for city in state.cities ]} for state in states if len(state.cities) > 0] 
-    [state.get("cities").sort() for state in serializer]
+    
+    serializer = [{"state": state.name, "cities": sorted([city.name for city in state.cities ])} for state in states if len(state.cities) > 0] 
       
     return serializer
 
