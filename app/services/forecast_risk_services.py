@@ -6,10 +6,8 @@ from app.exceptions.generic_exc import (
     InvalidTypeError,
     MissingKeysError,
 )
-from app.models.address_model import AddressModel
-from app.models.city_model import CityModel
-from app.models.state_model import StateModel
-from app.models.user_model import UserModel
+from app.models import AddressModel, CityModel, StateModel, UserModel
+from app.utils.name_char_normalizer import name_char_normalizer
 
 
 def get_cities_in_risk(data: dict, precipitation_limit: int):
@@ -23,40 +21,64 @@ def get_cities_in_risk(data: dict, precipitation_limit: int):
     return risk_situation
 
 
-def get_endangered_cities(data: dict, precipitation_limit: int):
+def get_endangered_cities_and_users(data: dict, precipitation_limit: int):
 
     risk_situation = get_cities_in_risk(data, precipitation_limit)
 
     session: Session = db.session
 
+    cities = session.query(CityModel).all()
+
     endangered_cities = []
+    all_users = []
 
     for forecast in risk_situation:
         state_name = forecast.get("state")
         city_name = forecast.get("city")
+        precipitation = forecast.get("precipitation")
 
-        users = (
-            session.query(UserModel)
-            .join(AddressModel)
-            .join(CityModel)
-            .join(StateModel)
-            .filter(StateModel.name == state_name)
-            .filter(CityModel.name == city_name)
-            .all()
-        )
-
-        if users:
-            city_info = {
-                # TODO check the normalization method that will be added in the database
-                # and change it in here
-                "city": city_name.title(),
-                "state": state_name.title(),
-                "users_warned": len(users),
+        city_state = [
+            {
+                "city": {"id": city.id, "name": city.name},
+                "state": {"id": city.state.id, "name": city.state.name},
             }
+            for city in cities
+            if name_char_normalizer(city.name) == name_char_normalizer(city_name)
+            and name_char_normalizer(city.state.name)
+            == name_char_normalizer(state_name)
+        ]
 
-            endangered_cities.append(city_info)
+        if city_state:
+            users = (
+                session.query(UserModel)
+                .join(AddressModel)
+                .join(CityModel)
+                .join(StateModel)
+                .filter(StateModel.id == city_state[0].get("state").get("id"))
+                .filter(CityModel.id == city_state[0].get("city").get("id"))
+                .all()
+            )
 
-    return endangered_cities
+            if users:
+                city_info = {
+                    "city": city_state[0].get("city").get("name"),
+                    "state": city_state[0].get("state").get("name"),
+                    "users_warned": len(users),
+                    "precipitation_level": precipitation,
+                }
+
+                endangered_cities.append(city_info)
+                all_users.append(users)
+
+    all_users = [user for sub_user in all_users for user in sub_user]
+
+    sorted_endangered_cities = sorted(
+        endangered_cities,
+        key=lambda sort_from: sort_from["precipitation_level"],
+        reverse=True,
+    )
+
+    return sorted_endangered_cities, all_users
 
 
 def request_validator(data: list):

@@ -16,6 +16,7 @@ from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.generic_services import get_user_from_token
+from app.services.user_risk_profile_services import insert_default_risk
 from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
 
@@ -39,6 +40,8 @@ def signup():
             new_cep = AddressModel(cep=cep)
             new_cep.city = city_query
             new_user.address = new_cep
+
+        insert_default_risk(new_user)
 
         session.commit()
     except ZipCodeNotFoundError as e:

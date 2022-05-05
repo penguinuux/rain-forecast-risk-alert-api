@@ -19,6 +19,8 @@ class RiskModel(db.Model):
     title = Column(String, nullable=False, unique=True)
     text = Column(String, nullable=False)
 
+    VALIDATOR = {"live_nearby_river": bool, "live_nearby_mountain": bool}
+
     CASES = {
         "NOT_SPECIFIED": {"live_nearby_river": False, "live_nearby_mountain": False},
         "EARTH_SLIDING": {"live_nearby_river": False, "live_nearby_mountain": True},
