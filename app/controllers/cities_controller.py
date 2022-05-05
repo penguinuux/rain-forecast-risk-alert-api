@@ -3,8 +3,7 @@ from http import HTTPStatus
 from flask import jsonify
 
 from app.exceptions.state_exc import StateNotFoundError
-from app.services.cities_services import (get_cities_from_state,
-                                          get_states_and_cities)
+from app.services.cities_services import get_cities_from_state, get_states_and_cities
 
 
 def all_states_and_cities():

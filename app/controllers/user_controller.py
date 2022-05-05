@@ -11,18 +11,19 @@ from app.exceptions.city_exc import (
     CityOutOfRangeError,
     ZipCodeNotFoundError,
 )
+from app.exceptions.data_validation_exc import InvalidFormat
 from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.user_data_formater_services import validate_data
 from app.utils.zip_code_validate import validate_zip_code
-from app.exceptions.data_validation_exc import InvalidFormat
+
 
 def signup():
     session: Session = db.session
     data = request.get_json()
- 
+
     try:
 
         validate_data(data)
@@ -52,7 +53,7 @@ def signup():
         return e.message, e.status_code
 
     except InvalidFormat as error:
-        return error.message,error.status_code
+        return error.message, error.status_code
 
     return (
         jsonify(

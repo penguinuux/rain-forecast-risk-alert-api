@@ -4,13 +4,13 @@ from http import HTTPStatus
 class InvalidFormat(Exception):
     def __init__(
         self,
-        key: str='',
-        expected_format: str = '',
-        received_format: str = '',
+        key: str = "",
+        expected_format: str = "",
+        received_format: str = "",
         status_code: int = HTTPStatus.BAD_REQUEST,
         message: str = "",
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(args, kwargs)
         if message:
