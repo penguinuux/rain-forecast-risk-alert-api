@@ -8,6 +8,9 @@ from app.configs.database import db
 
 @dataclass
 class MessageModel(db.Model):
+    id: int
+    date: str
+
     __tablename__ = "message_logs"
 
     id = Column(Integer, primary_key=True)

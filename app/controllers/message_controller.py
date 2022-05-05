@@ -1,32 +1,35 @@
 from http import HTTPStatus
 
-from flask import jsonify
-from sqlalchemy.orm import Query, Session
+from flask import jsonify, request
+from requests import Session
+from sqlalchemy.orm import Session
 
 from app.configs.database import db
 from app.models.message_model import MessageModel
+from app.services.messages_services import query_by_city, query_by_date, query_by_state
 
 
 def retrieve():
 
+    data = request.args
+
+    date = data.get("date", default=None)
+    city = data.get("city", default=None)
+    state = data.get("state", default=None)
+
+    if date:
+        return query_by_date(date)
+
+    if city:
+        return query_by_city(city)
+
+    if state:
+        return query_by_state(state)
+
     session: Session = db.session
-
-    base_query: Query = session.query(MessageModel)
-
-    messages = base_query.all()
+    messages = session.query(MessageModel).all()
 
     return (
-        jsonify(
-            [
-                {
-                    "message id": message.id,
-                    "title": message.title,
-                    "text": message.text,
-                    "date": message.date,
-                    "related users": message.users,
-                }
-                for message in messages
-            ]
-        ),
+        jsonify(messages),
         HTTPStatus.OK,
     )

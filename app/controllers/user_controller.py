@@ -12,6 +12,7 @@ from app.exceptions.city_exc import (
     InvalidZipCodeFormatError,
     ZipCodeNotFoundError,
 )
+from app.exceptions.data_validation_exc import InvalidFormat
 from app.exceptions.generic_exc import (
     InvalidCredentialsError,
     InvalidKeysError,
@@ -66,6 +67,9 @@ def signup():
         return e.message, e.status_code
     except InvalidTypeError as e:
         return e.message, e.status_code
+
+    except InvalidFormat as error:
+        return error.message, error.status_code
 
     return (
         jsonify(
@@ -130,7 +134,10 @@ def delete():
     session: Session = db.session
 
     try:
-        user = get_user_from_token()
+        token = request.headers.get("Authorization").split()[-1]
+        decoded_jwt = decode_token(token)
+        user_id = decoded_jwt.get("sub")
+        user: UserModel = UserModel.query.get(user_id)
         if not user:
             raise UserNotFound
     except UserNotFound as e:
