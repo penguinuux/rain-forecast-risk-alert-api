@@ -6,16 +6,16 @@ from flask_jwt_extended import create_access_token, decode_token, jwt_required
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
-from app.exceptions.city_exc import (
-    CityNotFoundError,
-    CityOutOfRangeError,
-    ZipCodeNotFoundError,
-)
-from app.exceptions.generic_exc import ObjNotFoundError
+from app.exceptions.city_exc import CityOutOfRangeError
+    
+
+from app.exceptions.generic_exc import NotFoundError
 from app.exceptions.generic_exc import InvalidKeysError
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
+from app.services.generic_services import get_user_from_token
+from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
 
 
@@ -40,9 +40,7 @@ def signup():
             new_user.address = new_cep
 
         session.commit()
-    except ObjNotFoundError as e:
-        return e.message, e.status_code
-    except CityNotFoundError as e:
+    except NotFoundError as e:
         return e.message, e.status_code
     except CityOutOfRangeError as e:
         return e.message, e.status_code
@@ -110,13 +108,10 @@ def delete():
     session: Session = db.session
 
     try:
-        token = request.headers.get("Authorization").split()[-1]
-        decoded_jwt = decode_token(token)
-        user_id = decoded_jwt.get("sub")
-        user: UserModel = UserModel.query.get(user_id)
+        user = get_user_from_token()
         if not user:
-            raise UserNotFound
-    except UserNotFound as e:
+            raise NotFoundError(request = "user")
+    except NotFoundError as e:
         return e.message, e.status_code
 
     session.delete(user)
@@ -127,33 +122,16 @@ def delete():
 
 @jwt_required()
 def patch():
-    authorized_keys = ["email", "phone", "name", "password"]
-
+    session: Session = db.session
+    allowed_keys = ["email", "phone", "name", "password"]
     try:
         data = request.get_json()
-        session: Session = db.session
-        token = request.headers.get("Authorization").split()[-1]
-        decoded_jwt = decode_token(token)
-        user_id = decoded_jwt.get("sub")
-        user: UserModel = UserModel.query.get(user_id)
-
-        if not user:
-            raise UserNotFound
-
-        invalid_keys = []
-
-        for key, value in data.items():
-            if key in authorized_keys:
-                setattr(user, key, value)
-            else:
-                invalid_keys.append(key)
-
-        if invalid_keys:
-            raise InvalidKeysError(authorized_keys, invalid_keys)
+        user = get_user_from_token()
+        validate_keys_and_values(data, user, allowed_keys)
 
     except InvalidKeysError as e:
         return e.message, e.status_code
-    except UserNotFound as e:
+    except NotFoundError as e:
         return e.message, e.status_code
 
     session.commit()

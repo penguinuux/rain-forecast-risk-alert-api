@@ -69,7 +69,7 @@ class InvalidKeysError(Exception):
 
         self.status_code = status_code
 
-class ObjNotFoundError(Exception):
+class NotFoundError(Exception):
     def __init__(
         self,
         request: str = "request",

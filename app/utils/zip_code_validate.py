@@ -5,13 +5,10 @@ from sqlalchemy.orm import Session
 from werkzeug import Client
 
 from app.configs.database import db
-from app.exceptions.city_exc import (
-    CityNotFoundError,
-    CityOutOfRangeError,
-    ZipCodeNotFoundError,
-)
+from app.exceptions.city_exc import CityOutOfRangeError
 
-from app.exceptions.generic_exc import ObjNotFoundError
+
+from app.exceptions.generic_exc import NotFoundError
 from app.models.city_model import CityModel
 
 
@@ -44,7 +41,7 @@ async def validate_zip_code(zip_code: str):
     uf = zip_dict.get("uf")
 
     if error:
-        raise ObjNotFoundError("zip-code")
+        raise NotFoundError("zip-code")
 
     city_query = session.query(CityModel).filter_by(name=city).first()
 
@@ -52,7 +49,7 @@ async def validate_zip_code(zip_code: str):
         cities = session.query(CityModel).all()
         cities_formatted = [{"city": city.name, "uf": city.state.uf} for city in cities]
         message = {"error": "city not found!", "cities_expected": cities_formatted, "received_city": city}
-        raise ObjNotFoundError(message = message)
+        raise NotFoundError(message = message)
 
     if city_query.state.uf != uf:
         raise CityOutOfRangeError(expected_type=cities_formatted, received_type=city)

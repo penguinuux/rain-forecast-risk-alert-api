@@ -2,7 +2,7 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.state_exc import StateNotFoundError
-from app.exceptions.generic_exc import ObjNotFoundError
+from app.exceptions.generic_exc import NotFoundError
 from app.models.state_model import StateModel
 
 
@@ -27,7 +27,7 @@ def get_cities_from_state(state):
     state_from_table = base_query.filter_by(name=state).first()
 
     if not state_from_table:
-        raise ObjNotFoundError(state)
+        raise NotFoundError(request = state)
 
     cities_from_state = {"state": state_from_table.name, "cities": state_from_table.cities}
 
