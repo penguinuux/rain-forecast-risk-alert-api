@@ -140,6 +140,7 @@ def patch():
         data = request.get_json()
         user = get_user_from_token()
 
+        validate_data(data)
         validate_keys_and_values(data, user, update=True)
 
         cep = data.get("cep", None)
