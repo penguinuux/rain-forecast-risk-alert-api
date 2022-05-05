@@ -8,12 +8,13 @@ from app.models.state_model import StateModel
 def get_states_and_cities():
     session: Session = db.session
 
-    base_query: Query = session.query(StateModel)
+    base_query: Query = session.query(StateModel).order_by(StateModel.name)
 
     states = base_query.all()
 
-    serializer = [{"state": state.name, "cities": state.cities} for state in states]
-
+    serializer = [{"state": state.name, "cities": [city.name for city in state.cities ]} for state in states if len(state.cities) > 0] 
+    [state.get("cities").sort() for state in serializer]
+      
     return serializer
 
 
@@ -28,6 +29,6 @@ def get_cities_from_state(state):
     if not state:
         raise StateNotFoundError
 
-    cities_from_state = {"state": state.name, "cities": state.cities}
+    cities_from_state = {"state": state.name, "cities": [city.name for city in state.cities ]}
 
     return cities_from_state
