@@ -7,10 +7,12 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
+    CityNotFoundError,
     CityOutOfRangeError,
     InvalidZipCodeFormatError,
     ZipCodeNotFoundError,
 )
+from app.exceptions.data_validation_exc import InvalidFormat
 from app.exceptions.generic_exc import (
     InvalidCredentialsError,
     InvalidKeysError,
@@ -19,8 +21,7 @@ from app.exceptions.generic_exc import (
     UniqueKeyError,
 )
 from app.exceptions.user_exc import UserNotFound
-from app.models.address_model import AddressModel
-from app.models.user_model import UserModel
+from app.models import AddressModel, UserModel
 from app.services.generic_services import get_user_from_token
 from app.services.user_risk_profile_services import insert_default_risk
 from app.services.user_services import validate_keys_and_values
@@ -66,6 +67,9 @@ def signup():
     except InvalidTypeError as e:
         return e.message, e.status_code
 
+    except InvalidFormat as error:
+        return error.message, error.status_code
+
     return (
         jsonify(
             {
@@ -83,6 +87,15 @@ def signup():
 
 def signin():
     data = request.get_json()
+
+    try:
+        validate_keys_and_values(data, signin=True)
+    except MissingKeysError as error:
+        return error.message, error.status_code
+    except InvalidKeysError as error:
+        return error.message, error.status_code
+    except InvalidTypeError as error:
+        return error.message, error.status_code
 
     user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
 
@@ -129,7 +142,10 @@ def delete():
     session: Session = db.session
 
     try:
-        user = get_user_from_token()
+        token = request.headers.get("Authorization").split()[-1]
+        decoded_jwt = decode_token(token)
+        user_id = decoded_jwt.get("sub")
+        user: UserModel = UserModel.query.get(user_id)
         if not user:
             raise UserNotFound
     except UserNotFound as e:
@@ -163,8 +179,6 @@ def patch():
     except InvalidTypeError as e:
         return e.message, e.status_code
     except UniqueKeyError as e:
-        return e.message, e.status_code
-    except InvalidCredentialsError as e:
         return e.message, e.status_code
     except CityNotFoundError as e:
         return e.message, e.status_code

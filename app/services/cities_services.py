@@ -9,11 +9,15 @@ from app.utils.name_char_normalizer import name_char_normalizer
 def get_states_and_cities():
     session: Session = db.session
 
-    base_query: Query = session.query(StateModel)
+    base_query: Query = session.query(StateModel).order_by(StateModel.name)
 
     states = base_query.all()
 
-    serializer = [{"state": state.name, "cities": state.cities} for state in states]
+    serializer = [
+        {"state": state.name, "cities": sorted([city.name for city in state.cities])}
+        for state in states
+        if len(state.cities) > 0
+    ]
 
     return serializer
 
