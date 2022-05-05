@@ -14,7 +14,11 @@ from app.models.user_model import UserModel
 
 
 def validate_keys_and_values(
-    data: dict, user: UserModel = {}, update: bool = False, signup: bool = False
+    data: dict,
+    user: UserModel = {},
+    update: bool = False,
+    signin: bool = False,
+    signup: bool = False,
 ):
 
     validator = UserModel.VALIDATOR
@@ -23,6 +27,8 @@ def validate_keys_and_values(
         validate_keys_and_values_update(data, user, validator)
     elif signup:
         validate_keys_and_values_signup(data, validator)
+    elif signin:
+        validate_keys_and_values_signin(data, validator)
 
 
 def validate_keys_and_values_update(data: dict, user: UserModel, validator: dict):
@@ -47,6 +53,19 @@ def validate_keys_and_values_signup(data: dict, validator: dict):
     validate_invalid_keys(data, validator_keys)
     validate_invalid_types(data, validator)
     validate_for_unique(data, validator)
+
+
+def validate_keys_and_values_signin(data: dict, validator: dict):
+
+    signin_keys = ["email", "password"]
+    validator = deepcopy(validator)
+    validator = {key: value for key, value in validator.items() if key in signin_keys}
+
+    validator_keys = list(validator.keys())
+
+    validate_missing_keys(data, validator_keys)
+    validate_invalid_keys(data, validator_keys)
+    validate_invalid_types(data, validator)
 
 
 def validate_and_setattr(data: dict, user: UserModel, allowed_keys: list):
