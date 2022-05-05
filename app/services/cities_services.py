@@ -30,9 +30,9 @@ def get_cities_from_state(state):
 
     states = base_query.all()
 
-    city_state = [
+    state_and_cities = [
         {
-            "name": estate.name,
+            "state": estate.name,
             "cities": sorted([cities.name for cities in estate.cities]),
         }
         for estate in states
@@ -40,7 +40,7 @@ def get_cities_from_state(state):
         or name_char_normalizer(estate.uf) == name_char_normalizer(state)
     ]
 
-    if not city_state:
+    if not state_and_cities:
         raise StateNotFoundError
 
-    return city_state
+    return state_and_cities
