@@ -7,6 +7,7 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
+    CityNotFoundError,
     CityOutOfRangeError,
     InvalidZipCodeFormatError,
     ZipCodeNotFoundError,

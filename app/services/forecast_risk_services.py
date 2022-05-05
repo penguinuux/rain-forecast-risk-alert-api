@@ -7,6 +7,7 @@ from app.exceptions.generic_exc import (
     MissingKeysError,
 )
 from app.models import AddressModel, CityModel, StateModel, UserModel
+from app.models.message_model import MessageModel
 from app.utils.name_char_normalizer import name_char_normalizer
 
 
@@ -193,3 +194,14 @@ def get_correct_type_message(types: list) -> str:
         message = f"{', '.join(normalize_types[0:-1])} or {normalize_types[-1]}"
 
     return message
+
+
+def create_message_log(users: list[UserModel]):
+    session: Session = db.session()
+    message = MessageModel()
+
+    # Append the message into each user.
+    [message.users.append(user) for user in users]
+
+    session.add(message)
+    session.commit()

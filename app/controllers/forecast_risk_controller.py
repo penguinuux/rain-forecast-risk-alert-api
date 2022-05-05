@@ -2,11 +2,17 @@ import asyncio
 from http import HTTPStatus
 
 from flask import request
+from sqlalchemy.orm import Session
 
+from app.configs.database import db
 from app.decorators.forecast_risk_decorator import request_validator
 from app.models import RiskModel
+from app.models.message_model import MessageModel
 from app.services.communication_services import sms_send
-from app.services.forecast_risk_services import get_endangered_cities_and_users
+from app.services.forecast_risk_services import (
+    create_message_log,
+    get_endangered_cities_and_users,
+)
 from app.utils.phone_only_numbers_formatter import phone_with_only_numbers
 
 
@@ -30,5 +36,7 @@ def fetch_forecast_risk():
         message = user.risks[0].text
         phone = phone_with_only_numbers(user.phone)
         asyncio.run(sms_send(phone, message))
+
+    create_message_log(users)
 
     return {"endangered_cities": endangered_cities}, HTTPStatus.OK
