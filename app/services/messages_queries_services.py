@@ -15,13 +15,8 @@ session: Session = db.session
 
 def query_by_date(date):
 
-    base_query: Query = session.query(MessageModel)
-
-    messages = base_query.all()
-
-    if date:
-        date_query: Query = session.query(MessageModel).filter_by(date=date).first()
-        return jsonify(date_query), HTTPStatus.OK
+    date_query: Query = session.query(MessageModel).filter_by(date=date).first()
+    return jsonify(date_query), HTTPStatus.OK
 
 
 def query_by_city(city):
