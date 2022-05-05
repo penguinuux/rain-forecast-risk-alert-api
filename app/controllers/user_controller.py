@@ -11,7 +11,6 @@ from app.exceptions.city_exc import CityOutOfRangeError
 
 from app.exceptions.generic_exc import NotFoundError
 from app.exceptions.generic_exc import InvalidKeysError
-from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.generic_services import get_user_from_token
