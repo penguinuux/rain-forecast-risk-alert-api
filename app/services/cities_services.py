@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
-from app.exceptions.state_exc import StateNotFoundError
 from app.exceptions.generic_exc import NotFoundError
 from app.models.state_model import StateModel
 
