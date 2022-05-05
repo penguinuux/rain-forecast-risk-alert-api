@@ -32,8 +32,8 @@ def query_by_city(city):
         return (
             {
                 "city": city,
-                "users_message": [
-                    {"user": user.name, "user messages": user.messages}
+                "city_messages_events": [
+                    {"user": user.name, "user_message_log": user.messages}
                     for user in city_query
                 ],
             },
@@ -55,8 +55,8 @@ def query_by_state(state):
         return (
             {
                 "state": state,
-                "users_message": [
-                    {"user": user.name, "user messages": user.messages}
+                "state_messages_events": [
+                    {"user": user.name, "user_message_log": user.messages}
                     for user in state_query
                 ],
             },
