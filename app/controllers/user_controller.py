@@ -11,7 +11,13 @@ from app.exceptions.city_exc import (
     CityOutOfRangeError,
     ZipCodeNotFoundError,
 )
-from app.exceptions.generic_exc import InvalidKeysError
+from app.exceptions.generic_exc import (
+    InvalidCredentialsError,
+    InvalidKeysError,
+    InvalidTypeError,
+    MissingKeysError,
+    UniqueKeyError,
+)
 from app.exceptions.user_exc import UserNotFound
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
@@ -25,10 +31,11 @@ def signup():
     session: Session = db.session
     data = request.get_json()
 
-    cep = data.pop("cep")
-
     try:
 
+        validate_keys_and_values(data, signup=True)
+
+        cep = data.pop("cep")
         city_query = asyncio.run(validate_zip_code(cep))
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
 
@@ -49,6 +56,14 @@ def signup():
     except CityNotFoundError as e:
         return e.message, e.status_code
     except CityOutOfRangeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except MissingKeysError as e:
+        return e.message, e.status_code
+    except InvalidKeysError as e:
+        return e.message, e.status_code
+    except InvalidTypeError as e:
         return e.message, e.status_code
 
     return (
@@ -129,16 +144,34 @@ def delete():
 @jwt_required()
 def patch():
     session: Session = db.session
-    allowed_keys = ["email", "phone", "name", "password"]
     try:
         data = request.get_json()
         user = get_user_from_token()
-        validate_keys_and_values(data, user, allowed_keys)
 
+        validate_keys_and_values(data, user, update=True)
+
+        cep = data.get("cep", None)
+        if cep:
+            asyncio.run(validate_zip_code(cep))
+
+    except MissingKeysError as e:
+        return e.message, e.status_code
     except InvalidKeysError as e:
         return e.message, e.status_code
     except UserNotFound as e:
         return e.message, e.status_code
+    except InvalidTypeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except InvalidCredentialsError as e:
+        return e.message, e.status_code
+    except CityNotFoundError as e:
+        return e.message, e.status_code
+
+    for key, value in data.items():
+        if key in UserModel.VALIDATOR.keys():
+            setattr(user, key, value)
 
     session.commit()
 
