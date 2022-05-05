@@ -17,7 +17,7 @@ def all_cities_from_state(state):
 
     try:
 
-        cities_from_state = get_cities_from_state(state) 
+        cities_from_state = get_cities_from_state(state)
 
     except NotFoundError as err:
         return err.message, err.status_code

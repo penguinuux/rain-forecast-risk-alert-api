@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+
 class CityOutOfRangeError(Exception):
     def __init__(
         self,

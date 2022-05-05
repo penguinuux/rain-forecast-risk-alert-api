@@ -9,7 +9,7 @@ class InvalidTypeError(Exception):
         message: str = "",
         status_code: int = HTTPStatus.BAD_REQUEST,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(args, kwargs)
         if message:
@@ -32,7 +32,7 @@ class MissingKeysError(Exception):
         message: str = "",
         status_code: int = HTTPStatus.BAD_REQUEST,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(args, kwargs)
         if message:
@@ -55,7 +55,7 @@ class InvalidKeysError(Exception):
         message: str = "",
         status_code: int = HTTPStatus.BAD_REQUEST,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(args, kwargs)
         if message:
@@ -69,6 +69,7 @@ class InvalidKeysError(Exception):
 
         self.status_code = status_code
 
+
 class NotFoundError(Exception):
     def __init__(
         self,
@@ -76,9 +77,9 @@ class NotFoundError(Exception):
         message: str = "",
         status_code: int = HTTPStatus.NOT_FOUND,
         *args,
-        **kwargs
+        **kwargs,
     ):
-        super().__init__(args,kwargs)
+        super().__init__(args, kwargs)
         if message:
             self.message = message
         else:
@@ -88,4 +89,37 @@ class NotFoundError(Exception):
 
         self.status_code = status_code
 
-        
+
+class UniqueKeyError(Exception):
+    def __init__(
+        self,
+        key: str = "",
+        message: str = "",
+        status_code: int = HTTPStatus.CONFLICT,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(args, kwargs)
+        if message:
+            self.message = message
+        else:
+            self.message = {"error": f"unique {key} error"}
+
+        self.status_code = status_code
+
+
+class InvalidCredentialsError(Exception):
+    def __init__(
+        self,
+        message: str = "",
+        status_code: int = HTTPStatus.BAD_REQUEST,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(args, kwargs)
+        if message:
+            self.message = message
+        else:
+            self.message = {"error": "invalid credentials"}
+
+        self.status_code = status_code

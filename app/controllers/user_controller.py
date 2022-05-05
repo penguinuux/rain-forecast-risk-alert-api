@@ -7,13 +7,18 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import CityOutOfRangeError
-    
-
-from app.exceptions.generic_exc import NotFoundError
-from app.exceptions.generic_exc import InvalidKeysError
+from app.exceptions.generic_exc import (
+    InvalidCredentialsError,
+    InvalidKeysError,
+    InvalidTypeError,
+    MissingKeysError,
+    NotFoundError,
+    UniqueKeyError,
+)
 from app.models.address_model import AddressModel
 from app.models.user_model import UserModel
 from app.services.generic_services import get_user_from_token
+from app.services.user_risk_profile_services import insert_default_risk
 from app.services.user_services import validate_keys_and_values
 from app.utils.zip_code_validate import validate_zip_code
 
@@ -22,10 +27,11 @@ def signup():
     session: Session = db.session
     data = request.get_json()
 
-    cep = data.pop("cep")
-
     try:
 
+        validate_keys_and_values(data, signup=True)
+
+        cep = data.pop("cep")
         city_query = asyncio.run(validate_zip_code(cep))
         cep_query = session.query(AddressModel).filter_by(cep=cep).first()
 
@@ -38,10 +44,20 @@ def signup():
             new_cep.city = city_query
             new_user.address = new_cep
 
+        insert_default_risk(new_user)
+
         session.commit()
     except NotFoundError as e:
         return e.message, e.status_code
     except CityOutOfRangeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except MissingKeysError as e:
+        return e.message, e.status_code
+    except InvalidKeysError as e:
+        return e.message, e.status_code
+    except InvalidTypeError as e:
         return e.message, e.status_code
 
     return (
@@ -109,7 +125,7 @@ def delete():
     try:
         user = get_user_from_token()
         if not user:
-            raise NotFoundError(request = "user")
+            raise NotFoundError(request="user")
     except NotFoundError as e:
         return e.message, e.status_code
 
@@ -122,16 +138,32 @@ def delete():
 @jwt_required()
 def patch():
     session: Session = db.session
-    allowed_keys = ["email", "phone", "name", "password"]
     try:
         data = request.get_json()
         user = get_user_from_token()
-        validate_keys_and_values(data, user, allowed_keys)
 
+        validate_keys_and_values(data, user, update=True)
+
+        cep = data.get("cep", None)
+        if cep:
+            asyncio.run(validate_zip_code(cep))
+
+    except MissingKeysError as e:
+        return e.message, e.status_code
     except InvalidKeysError as e:
         return e.message, e.status_code
     except NotFoundError as e:
         return e.message, e.status_code
+    except InvalidTypeError as e:
+        return e.message, e.status_code
+    except UniqueKeyError as e:
+        return e.message, e.status_code
+    except InvalidCredentialsError as e:
+        return e.message, e.status_code
+
+    for key, value in data.items():
+        if key in UserModel.VALIDATOR.keys():
+            setattr(user, key, value)
 
     session.commit()
 

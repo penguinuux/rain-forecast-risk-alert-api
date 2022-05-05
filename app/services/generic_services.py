@@ -12,6 +12,6 @@ def get_user_from_token():
     user: UserModel = UserModel.query.get(user_id)
 
     if not user:
-        raise NotFoundError(request = "user")
+        raise NotFoundError(request="user")
 
     return user

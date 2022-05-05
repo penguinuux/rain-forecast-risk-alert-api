@@ -26,8 +26,11 @@ def get_cities_from_state(state):
     state_from_table = base_query.filter_by(name=state).first()
 
     if not state_from_table:
-        raise NotFoundError(request = state)
+        raise NotFoundError(request=state)
 
-    cities_from_state = {"state": state_from_table.name, "cities": state_from_table.cities}
+    cities_from_state = {
+        "state": state_from_table.name,
+        "cities": state_from_table.cities,
+    }
 
     return cities_from_state

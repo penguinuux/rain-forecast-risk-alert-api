@@ -30,6 +30,14 @@ class UserModel(db.Model):
     address = relationship("AddressModel", backref="users", uselist=False)
     messages = relationship("MessageModel", secondary=users_messages, backref="users")
 
+    VALIDATOR = {
+        "name": {"type": str, "normalize": {str: "title"}},
+        "phone": {"type": str, "unique": True},
+        "email": {"type": str, "normalize": {str: "lower"}, "unique": True},
+        "password": {"type": str},
+        "cep": {"type": str},
+    }
+
     @property
     def password(self):
         raise AttributeError("Password cannot be accessed!")
