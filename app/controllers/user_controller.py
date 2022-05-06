@@ -111,33 +111,6 @@ def signin():
 
 
 @jwt_required()
-def retrieve():
-
-    session: Session = db.session
-
-    base_query: Query = session.query(UserModel)
-
-    users = base_query.all()
-
-    return (
-        jsonify(
-            [
-                {
-                    "name": user.name,
-                    "email": user.email,
-                    "phone": user.phone,
-                    "address": user.address.cep,
-                    "city": user.address.city.name,
-                    "state": user.address.city.state.name,
-                }
-                for user in users
-            ]
-        ),
-        HTTPStatus.OK,
-    )
-
-
-@jwt_required()
 def delete():
     session: Session = db.session
 
