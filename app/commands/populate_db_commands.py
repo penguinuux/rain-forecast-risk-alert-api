@@ -7,6 +7,7 @@ from sqlalchemy.orm import Query, Session
 
 from app.configs.database import db
 from app.models import AddressModel, CityModel, StateModel, UserModel
+from app.services.user_risk_profile_services import select_risk_case
 from app.utils import city_state_info
 
 
@@ -106,6 +107,9 @@ def create_user_addresses_and_insert_into_db(fake: Faker, amount: int):
 
         user_data = create_user_data(fake)
         user: UserModel = UserModel(**user_data)
+
+        risk_data = {"live_nearby_river": False, "live_nearby_mountain": False}
+        select_risk_case(risk_data, user)
 
         session.add(user)
         session.commit()
