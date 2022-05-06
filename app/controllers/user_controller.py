@@ -36,7 +36,6 @@ def signup():
     try:
 
         validate_keys_and_values(data, signup=True)
-
         validate_data(data)
 
         cep = data.pop("cep")
@@ -102,7 +101,7 @@ def signin():
     user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
 
     if not user:
-        return {"message": "User not found"}, HTTPStatus.NOT_FOUND
+        return {"message": "Unauthorized"}, HTTPStatus.NOT_FOUND
 
     if user.verify_password(data["password"]):
         token = create_access_token(user.id)
@@ -139,8 +138,8 @@ def patch():
         data = request.get_json()
         user = get_user_from_token()
 
-        validate_data(data)
         validate_keys_and_values(data, user, update=True)
+        validate_data(data)
 
         cep = data.get("cep", None)
         if cep:
@@ -159,6 +158,10 @@ def patch():
     except CityNotFoundError as e:
         return e.message, e.status_code
     except InvalidCredentialsError as e:
+        return e.message, e.status_code
+    except CityOutOfRangeError as e:
+        return e.message, e.status_code
+    except ZipCodeNotFoundError as e:
         return e.message, e.status_code
 
     for key, value in data.items():

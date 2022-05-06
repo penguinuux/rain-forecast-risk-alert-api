@@ -109,10 +109,11 @@ def create_user_addresses_and_insert_into_db(fake: Faker, amount: int):
         user: UserModel = UserModel(**user_data)
 
         risk_data = {"live_nearby_river": False, "live_nearby_mountain": False}
-        select_risk_case(risk_data, user)
 
         session.add(user)
         session.commit()
+
+        select_risk_case(risk_data, user)
 
     if amount > 1:
         print(f"Added {amount} users to the database successfully.", "\n")

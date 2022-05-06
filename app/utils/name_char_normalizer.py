@@ -7,7 +7,7 @@ def name_char_normalizer(name):
     """
 
     latin_characters = {
-        "Ááâà": "a",
+        "Ááâàã": "a",
         "Ééêè": "e",
         "Ííîì": "i",
         "Óóôò": "o",
