@@ -22,7 +22,7 @@ def get_states_and_cities():
     return serializer
 
 
-def get_cities_from_state(state):
+def get_cities_from_state(name):
 
     session: Session = db.session
 
@@ -32,12 +32,12 @@ def get_cities_from_state(state):
 
     state_and_cities = [
         {
-            "state": estate.name,
-            "cities": sorted([cities.name for cities in estate.cities]),
+            "state": state.name,
+            "cities": sorted([cities.name for cities in state.cities]),
         }
-        for estate in states
-        if name_char_normalizer(estate.name) == name_char_normalizer(state)
-        or name_char_normalizer(estate.uf) == name_char_normalizer(state)
+        for state in states
+        if name_char_normalizer(state.name) == name_char_normalizer(name)
+        or name_char_normalizer(state.uf) == name_char_normalizer(name)
     ]
 
     if not state_and_cities:
