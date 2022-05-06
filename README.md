@@ -5,21 +5,25 @@ BaseURL: "https://rain-forecast-risk-alert.herokuapp.com/"
 ```
 
 ---
+
 ## Summary
 
-* [Users](#users)
-  * [Signup](#users-signup)
-    * [Signup with an invalid city](#users-signup-invalid-city)
-  * [Get all users](#users-get)
-* [Forecast risk](#forecast-risk)
-  * [Forecast risk request with missing keys](#forecast-risk-missing-keys)
-  * [Forecast risk request with invalid keys](#forecast-risk-invalid-keys)
-  * [Forecast risk request with invalid value types](#forecast-risk-invalid-value-types)
-  * [Forecast risk request with invalid request type](#forecast-risk-invalid-request-type)
+- [Users](#users)
+  - [Signup](#users-signup)
+    - [Signup with an invalid city](#users-signup-invalid-city)
+  - [Get all users](#users-get)
+- [Forecast risk](#forecast-risk)
+  - [Forecast risk request with missing keys](#forecast-risk-missing-keys)
+  - [Forecast risk request with invalid keys](#forecast-risk-invalid-keys)
+  - [Forecast risk request with invalid value types](#forecast-risk-invalid-value-types)
+  - [Forecast risk request with invalid request type](#forecast-risk-invalid-request-type)
 
 ---
+
 ## <center>**Users** <a name="users"></a></center>
+
 ---
+
 ### <span style="color: green">**POST**</span> /api/users/signup <a name="users-signup"></a>
 
 Register a new user.
@@ -35,6 +39,7 @@ Register a new user.
 | phone     | string   | User phone number        |
 | cep       | string   | User location cep number |
 | city      | string   | User city location       |
+| password  | string   | User password            |
 
 **Body:**
 
@@ -44,7 +49,8 @@ Register a new user.
   "email": "d.motta@gmail.com",
   "phone": "24976520981",
   "cep": "25651-079",
-  "city": "Petrópolis"
+  "city": "Petrópolis",
+  "password": "uhtw86#b"
 }
 ```
 
@@ -135,41 +141,45 @@ Success-Response:
   }
 ]
 ```
+
 ---
+
 ## <center>**Forecast Risk** <a name="forecast-risk"></a></center>
+
 ---
+
 Send a list of cities, states and precipitation and returns a list of endangered cities along with a quantity of users in the cities. The precipitation values and which values correspond to a danger were defined in the code.
 
 - Not authenticated (?)
+
 ## Parameter
 
-| **Field**         | **Type**          | **Description**                      |
-| ------------------| ------------------| -------------------------------------|
-| city              | string            | A city name                          |
-| state             | string            | The city state                       |
-| precipitation     | integer or float  | A precipitation integer value in mm  |
+| **Field**     | **Type**         | **Description**                     |
+| ------------- | ---------------- | ----------------------------------- |
+| city          | string           | A city name                         |
+| state         | string           | The city state                      |
+| precipitation | integer or float | A precipitation integer value in mm |
 
 **Body:**
 
 ```json
 [
   {
-		"city": "Petrópolis",
-		"state": "Rio de Janeiro",
-		"precipitation": 80
-	},
-	{
-		"city": "São Paulo",
-		"state": "São Paulo",
-		"precipitation": 30
-	}
+    "city": "Petrópolis",
+    "state": "Rio de Janeiro",
+    "precipitation": 80
+  },
+  {
+    "city": "São Paulo",
+    "state": "São Paulo",
+    "precipitation": 30
+  }
 ]
 ```
 
 Success-Response:
 
 **HTTP/1.1**: 200 **OK**
-
 
 ```json
 {
@@ -193,14 +203,13 @@ Success-Response:
 ```json
 [
   {
-		"state": "Rio de Janeiro",
-		"precipitation": 80
-	},
-	{
-		"city": "São Paulo",
-		"state": "São Paulo",
-
-	}
+    "state": "Rio de Janeiro",
+    "precipitation": 80
+  },
+  {
+    "city": "São Paulo",
+    "state": "São Paulo"
+  }
 ]
 ```
 
@@ -211,33 +220,26 @@ Error-Response:
 ```json
 {
   "error": "missing keys",
-  "expected_keys": [
-    "city",
-    "state",
-    "precipitation"
-  ],
+  "expected_keys": ["city", "state", "precipitation"],
   "missing_keys": [
     {
       "request": {
         "state": "Rio de Janeiro",
         "precipitation": 80
       },
-      "missing_keys": [
-        "city"
-      ]
+      "missing_keys": ["city"]
     },
     {
       "request": {
-		    "city": "São Paulo",
-		    "state": "São Paulo",
+        "city": "São Paulo",
+        "state": "São Paulo"
       },
-      "missing_keys": [
-        "precipitation"
-      ]
+      "missing_keys": ["precipitation"]
     }
   ]
 }
 ```
+
 </details>
 
 <details>
@@ -247,20 +249,19 @@ Error-Response:
 
 ```json
 [
-	{
-		"city": "Petrópolis",
-		"state": "Rio de Janeiro",
-		"precipitation": 80,
-		"flood_risk": "high"
-	},
-	{
-		"city": "São Paulo",
-		"state": "São Paulo",
-		"precipitation": 30
-	}
+  {
+    "city": "Petrópolis",
+    "state": "Rio de Janeiro",
+    "precipitation": 80,
+    "flood_risk": "high"
+  },
+  {
+    "city": "São Paulo",
+    "state": "São Paulo",
+    "precipitation": 30
+  }
 ]
 ```
-
 
 Error-Response:
 
@@ -269,11 +270,7 @@ Error-Response:
 ```json
 {
   "error": "invalid keys",
-  "expected_keys": [
-    "city",
-    "state",
-    "precipitation"
-  ],
+  "expected_keys": ["city", "state", "precipitation"],
   "invalid_keys": [
     {
       "request": {
@@ -282,13 +279,12 @@ Error-Response:
         "precipitation": 80,
         "flood_risk": "high"
       },
-      "invalid_keys": [
-        "flood_risk"
-      ]
+      "invalid_keys": ["flood_risk"]
     }
   ]
 }
 ```
+
 </details>
 
 <details>
@@ -298,19 +294,18 @@ Error-Response:
 
 ```json
 [
-	{
-		"city": "Petrópolis",
-		"state": "Rio de Janeiro",
-		"precipitation": "high"
-	},
-	{
-		"city": "São Paulo",
-		"state": 23,
-		"precipitation": {"mm": 80}
-	}
+  {
+    "city": "Petrópolis",
+    "state": "Rio de Janeiro",
+    "precipitation": "high"
+  },
+  {
+    "city": "São Paulo",
+    "state": 23,
+    "precipitation": { "mm": 80 }
+  }
 ]
 ```
-
 
 Error-Response:
 
@@ -351,6 +346,7 @@ Error-Response:
   ]
 }
 ```
+
 </details>
 
 <details>
@@ -360,12 +356,11 @@ Error-Response:
 
 ```json
 {
-	"city": "Petrópolis",
-	"state": "Rio de Janeiro",
-	"precipitation": 80
+  "city": "Petrópolis",
+  "state": "Rio de Janeiro",
+  "precipitation": 80
 }
 ```
-
 
 Error-Response:
 
@@ -378,6 +373,92 @@ Error-Response:
   "received_type": "dict"
 }
 ```
+
 </details>
 
 ---
+
+## <center>**Messages** <a name="users"></a></center>
+
+---
+
+### <span style="color: green">**GET**</span> /api/messages <a name="messages-get"></a>
+
+Get a list of messages log.
+
+- Not authenticated
+
+**Parameter:**
+
+_Doesn't have_
+
+Success-Response:
+
+<details>
+<summary>messages request with invalid request type</summary> <a name="messages-valid-request-type"></a>
+**HTTP/1.1**: 200 **OK**
+
+```json
+[
+  {
+    "message id": 1,
+    "date": "Sat, 30 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      }
+    ]
+  },
+  {
+    "message id": 2,
+    "date": "Fri, 29 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520999",
+        "email": "d.motta@gmail.caom"
+      }
+    ]
+  },
+  {
+    "message id": 3,
+    "date": "Thu, 28 Apr 2022 00:00:00 GMT",
+    "related users": [
+      {
+        "name": "Danilo Motta",
+        "phone": "24976520981",
+        "email": "d.motta@gmail.com"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520981",
+        "email": "d.motta@gmail.coom"
+      },
+      {
+        "name": "Danilo Motta",
+        "phone": "24956520999",
+        "email": "d.motta@gmail.caom"
+      }
+    ]
+  }
+]
+```
+
+</details>

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.configs.database import db
@@ -30,6 +30,14 @@ class UserModel(db.Model):
     address = relationship("AddressModel", backref="users", uselist=False)
     messages = relationship("MessageModel", secondary=users_messages, backref="users")
 
+    VALIDATOR = {
+        "name": {"type": str, "normalize": {str: "title"}},
+        "phone": {"type": str, "unique": True},
+        "email": {"type": str, "normalize": {str: "lower"}, "unique": True},
+        "password": {"type": str},
+        "cep": {"type": str},
+    }
+
     @property
     def password(self):
         raise AttributeError("Password cannot be accessed!")
@@ -40,3 +48,13 @@ class UserModel(db.Model):
 
     def verify_password(self, password_to_hash):
         return check_password_hash(self.password_hash, password_to_hash)
+
+    @validates(*list(VALIDATOR.keys()))
+    def normalize_values(self, key, value):
+        normalize_mode = self.VALIDATOR[key].get("normalize", None)
+
+        if normalize_mode:
+            for type, func in normalize_mode.items():
+                value = type.__dict__[func](value)
+
+        return value
