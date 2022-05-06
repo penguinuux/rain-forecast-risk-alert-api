@@ -5,23 +5,35 @@ from app.exceptions.data_validation_exc import InvalidFormat
 
 def validate_data(data):
 
-    data["name"] = data["name"].title()
-    data["email"] = data["email"].lower()
+    email = data.get("email",None)
+    cep = data.get("cep", None)
+    phone = data.get("phone", None)
+    
+    if email:
 
-    email_pattern = "^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$"
-    email_form = re.fullmatch(email_pattern, data["email"].lower())
+        email = email.lower()
 
-    cep_pattern = "[0-9]{5}-[0-9]{3}"
-    cep_form = re.fullmatch(cep_pattern, data["cep"])
+        email_pattern = "^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$"
+        email_form = re.fullmatch(email_pattern, email)
+        
+        if not email_form:
+            raise InvalidFormat("email", "name@email.com", email)
 
-    phone_pattern = "([0-9]{2})[0-9]{5}-[0-9]{4}"
-    phone_form = re.fullmatch(phone_pattern, data["phone"])
+    if cep:
 
-    if not email_form:
-        raise InvalidFormat("email", "name@email.com", data["email"])
-    if not cep_form:
-        raise InvalidFormat("cep", "xxxxx-xxx", data["cep"])
-    if phone_form:
-        raise InvalidFormat("phone", "(xx)xxxxx-xxxx", data["phone"])
+        cep_pattern = "[0-9]{5}-[0-9]{3}"
+        cep_form = re.fullmatch(cep_pattern, cep)
 
-    return data
+        if not cep_form:
+            raise InvalidFormat("cep", "xxxxx-xxx", cep)
+
+    if phone:
+
+        phone_pattern = "([0-9]{2})[0-9]{5}-[0-9]{4}"
+        phone_form = re.fullmatch(phone_pattern, phone)
+
+        if phone_form:
+            raise InvalidFormat("phone", "(xx)xxxxx-xxxx", phone)
+
+
+

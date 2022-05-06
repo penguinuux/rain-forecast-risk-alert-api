@@ -149,8 +149,4 @@ def check_for_password(data: dict, user: UserModel):
         is_password_correct = user.verify_password(old_password)
 
         if not is_password_correct:
-            message = {
-                "error": "invalid credentials error",
-                "message": "old_password did not match",
-            }
-            raise InvalidCredentialsError(message=message)
+            raise InvalidCredentialsError
