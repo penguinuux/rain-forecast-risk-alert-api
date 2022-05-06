@@ -3,6 +3,7 @@ from sqlalchemy.orm import Query, Session
 from app.configs.database import db
 from app.exceptions.state_exc import StateNotFoundError
 from app.models.state_model import StateModel
+from app.utils.name_char_normalizer import name_char_normalizer
 
 
 def get_states_and_cities():
@@ -21,20 +22,25 @@ def get_states_and_cities():
     return serializer
 
 
-def get_cities_from_state(state):
+def get_cities_from_state(name):
 
     session: Session = db.session
 
     base_query: Query = session.query(StateModel)
 
-    state = base_query.filter_by(name=state).first()
+    states = base_query.all()
 
-    if not state:
+    state_and_cities = [
+        {
+            "state": state.name,
+            "cities": sorted([cities.name for cities in state.cities]),
+        }
+        for state in states
+        if name_char_normalizer(state.name) == name_char_normalizer(name)
+        or name_char_normalizer(state.uf) == name_char_normalizer(name)
+    ]
+
+    if not state_and_cities:
         raise StateNotFoundError
 
-    cities_from_state = {
-        "state": state.name,
-        "cities": [city.name for city in state.cities],
-    }
-
-    return cities_from_state
+    return state_and_cities
