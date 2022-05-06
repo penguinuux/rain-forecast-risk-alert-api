@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, decode_token, jwt_required
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 from app.configs.database import db
 from app.exceptions.city_exc import (
@@ -69,7 +69,6 @@ def signup():
         return e.message, e.status_code
     except InvalidTypeError as e:
         return e.message, e.status_code
-
     except InvalidFormat as error:
         return error.message, error.status_code
 
@@ -158,6 +157,8 @@ def patch():
     except UniqueKeyError as e:
         return e.message, e.status_code
     except CityNotFoundError as e:
+        return e.message, e.status_code
+    except InvalidCredentialsError as e:
         return e.message, e.status_code
 
     for key, value in data.items():

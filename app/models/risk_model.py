@@ -28,7 +28,6 @@ class RiskModel(db.Model):
         "FLOOD_AND_SLIDING": {"live_nearby_river": True, "live_nearby_mountain": True},
     }
 
-    # TODO: find a better way to display the texts
     VALUES = {
         "NOT_SPECIFIED": "FORTES CHUVAS: Se mora próximo a encosta ou rio, reúna pertences importantes (documento/dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil mais próximo.",
         "EARTH_SLIDING": "FORTES CHUVAS: RISCO DE DESLIZAMENTO, reúna pertences importantes (documentos e dinheiro) e dirija-se p/ o ponto de apoio da Defesa Civil mais próximo.",
